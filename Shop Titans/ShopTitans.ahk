@@ -4,16 +4,17 @@ item_sold = 0;
 item_bought = 0;
 surcharged = 0;
 smalltalked = 0;
+item_suggested = 0;
 
 item_background_found = 0;
 
-action_delay = 400;
-sell_delay = 800;
+action_delay = 900;
+sell_delay = 1300;
 
 NumpadSub::
 	Loop {
 		Gosub, SellItems
-		sleep, 500
+		sleep, action_delay
 	}
 	
 
@@ -31,11 +32,16 @@ SellItems:
 		Gosub, ResetFlags
 		Gosub, Surcharge
 		Gosub, SmallTalk
+		sleep, action_delay
 		Gosub, Sell
 		if (item_sold = 0){
 			Gosub, Buy
 			if (item_bought = 0){
-				Gosub, Refuse
+				sleep, action_delay
+				Gosub, Suggest
+				if (item_sold = 0){
+					Gosub, Refuse
+				}
 			}
 		} 
 		Gosub, CheckIfFlagsUnchanged
@@ -44,6 +50,12 @@ SellItems:
 		}
 		sleep sell_delay
 	}
+	return
+
+SellItemsOneTime:
+	Gosub, Surcharge
+	Gosub, Sell
+	sleep sell_delay
 	return
 
 Surcharge:
@@ -92,16 +104,27 @@ Buy:
 		MouseClick, left
 		item_bought := 1
 		sleep, action_delay
-		MsgBox % "Buy Found"
 	} 
 	return
 	
 ClickItemBackground:
-	ImageSearch, OutputVarX, OutputVarY, 0, 0, %A_ScreenWidth%, %A_ScreenHeight%, ItemBackground.png
+	ImageSearch, OutputVarX, OutputVarY, 500, 500, %A_ScreenWidth%, %A_ScreenHeight%, ItemBackground.png
 	if (OutputVarX > 0){
 		MouseMove, OutputVarX, OutputVarY
 		MouseClick, left
 		item_background_found := 1
+		sleep, action_delay
+	} 
+	return
+	
+Suggest:
+	ImageSearch, OutputVarX, OutputVarY, 500, 500, %A_ScreenWidth%, %A_ScreenHeight%, Suggest.png
+	if (OutputVarX > 0){
+		MouseMove, OutputVarX, OutputVarY
+		MouseClick, left
+		item_suggested := 1
+		sleep, action_delay
+		Gosub, SellItemsOneTime
 		sleep, action_delay
 	} 
 	return
@@ -113,10 +136,11 @@ ResetFlags:
 	smalltalked = 0
 	item_bought = 0
 	refused = 0
+	item_suggested = 0
 	return
 	
 CheckIfFlagsUnchanged:
-	if (gold_coin_on_screen_flag = 1 and item_sold = 0 and surcharged = 0 and smalltalked = 0 and item_bought = 0 and refused = 0)
+	if (gold_coin_on_screen_flag = 1 and item_sold = 0 and surcharged = 0 and smalltalked = 0 and item_bought = 0 and refused = 0 and item_suggested = 0)
 		no_longer_selling = 1
 	return
 		
