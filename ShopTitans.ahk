@@ -8,8 +8,8 @@ item_suggested = 0;
 
 item_background_found = 0;
 
-action_delay = 900;
-sell_delay = 1300;
+action_delay = 500;
+sell_delay = 900;
 
 NumpadSub::
 	Loop {
