@@ -32,6 +32,7 @@ SellItems:
 		Gosub, ResetFlags
 		Gosub, Surcharge
 		Gosub, SmallTalk
+		Gosub, Surcharge
 		sleep, action_delay
 		Gosub, Sell
 		if (item_sold = 0){
